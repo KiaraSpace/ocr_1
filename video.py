@@ -1,55 +1,25 @@
-# importing pytesseract
-import pytesseract
-# importing opencv
 import cv2
+import numpy as np
+import easyocr
 
-# configuring pytesseract
-pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
-# error on this line is probably because the location of your tessseract.exe is different than mine.
+img = cv2.imread("demo3.jpeg")
 
-front_scale = 1.5
-font = cv2.FONT_HERSHEY_PLAIN
+reader = easyocr.Reader(["en"])
+result = reader.readtext(img, allowlist = 'ABCDEFGHJKLMNOPQRSTTUVWXYZ')
 
-# loading the webcam
-cap = cv2.VideoCapture(1)
+for res in result:
+    print(result)
+    pt0 = res[0][0]
+    pt1 = res[0][1]
+    pt2 = res[0][2]
+    pt3 = res[0][3]
 
-# In[ ]:
+    cv2.rectangle(img, pt0, (pt1[0], pt1[1]-23),(166,56,242),-1)
+    cv2.putText(img, res[1], (pt0[0], pt0[1]-3),2,0.8,(255,255,255),1)
 
-
-# if webcam couldnt be read for what so reasons.
-if not cap.isOpened():
-    cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    raise IOError("Cannot Open Video")
-
-# please watch my video explanation to understand the below codes.
-cntr = 0;
-while True:
-    ret, frame = cap.read()
-    cntr = cntr + 1;
-    if ((cntr % 20) == 0):
-
-        imgH, imgW, _ = frame.shape
-
-        x1, y1, w1, h1 = 0, 0, imgH, imgW
-
-        imgchar = pytesseract.image_to_string(frame)
-
-        imgboxes = pytesseract.image_to_boxes(frame)
-        for boxes in imgboxes.splitlines():
-            boxes = boxes.split(' ')
-            x, y, w, h = int(boxes[1]), int(boxes[2]), int(boxes[3]), int(boxes[4])
-            cv2.rectangle(frame, (x, imgH - y), (w, imgH - h), (0, 0, 255), 3)
-
-            cv2.putText(frame, imgchar, (x1 + int(w1 / 50), y1 + int(h1 / 50)), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
-                        (255, 0, 0), 2)
-
-            font = cv2.FONT_HERSHEY_SIMPLEX
-
-            cv2.imshow('Text detection', frame)
-
-            if cv2.waitKey(2) & 0xFF == ord('a'):
-                break
-
-cap.release()
+    cv2.circle(img, pt0, (255,0,0), 2)
+    cv2.circle(img, pt1, (0,255,0), 2)
+    cv2.circle(img, pt2, (0,0,255), 2)
+    cv2.circle(img, pt2, (0,255,255), 2)
+cv2.waitKey(0)
 cv2.destroyAllWindows()

@@ -1,9 +1,12 @@
 import cv2
 import numpy as np
 import pytesseract
+
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-img = cv2.imread("demo3.jpeg")
+img = cv2.imread("D:\SmarCity\AutomaticCar\images-20220630T145919Z-001\images\\055.jpg")
+
 #-------------------------------------------------
+
 #percent by which the image is resized
 scale_percent = 70
 #calculate the 50 percent of original dimensions
@@ -12,6 +15,7 @@ height = int(img.shape[0] * scale_percent / 100)
 # dsize
 dsize = (width, height)
 #-------------------------------------------------
+
 # resize image
 img = cv2.resize(img, dsize)
 cv2.imshow("img_contour", img)
@@ -37,13 +41,14 @@ for c in contours:
     ratio = h/w
     area = cv2.contourArea(c)
     base = np.ones(thresh.shape, dtype=np.uint8)
-    if ratio > 0.9 and 100 < area < 10000:
+    #Adjust the ratio will allow us to recognize more cubes
+    if ratio > 0.5 and 100 < area < 10000:
         base[y:y+h, x:x+w] = thresh[y:y+h, x:x+w]
         segment = cv2.bitwise_not(base)
         print(segment)
         custom_config = r'-l eng --oem 3 --psm 10 -c tessedit_char_whitelist="ABCDEFGHIJKLMNOPQRSTUVWXYZ" '
         c = pytesseract.image_to_string(segment, config=custom_config)
-        cv2.putText(img_contour, c, (x + int(w / 50), y + int(h / 50)), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+        cv2.putText(img_contour, str(c)[:1], (x + int(w / 50), y + int(h / 50)), cv2.FONT_HERSHEY_SIMPLEX, 1.5,
                     (255, 0, 0), 2)
         print(c)
         detected = detected + c
