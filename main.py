@@ -42,7 +42,7 @@ for c in contours:
     area = cv2.contourArea(c)
     base = np.ones(thresh.shape, dtype=np.uint8)
     #Adjust the ratio will allow us to recognize more cubes
-    if ratio > 0.5 and 100 < area < 10000:
+    if ratio > 1 and 100 < area < 10000:
         base[y:y+h, x:x+w] = thresh[y:y+h, x:x+w]
         segment = cv2.bitwise_not(base)
         print(segment)
